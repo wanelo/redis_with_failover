@@ -21,7 +21,7 @@ module RedisWithFailover
           response = server.send(method, *args, &block)
           break
         rescue *EXCEPTIONS_TO_HANDLE => e
-          failover_callback.call if failover_callback
+          failover_callback.call(server) if failover_callback
           error = e
         end
       end
