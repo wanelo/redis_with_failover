@@ -26,7 +26,7 @@ describe RedisWithFailover::Client do
     it 'sets failover_proc to block' do
       failover_proc = -> {}
       client = RedisWithFailover::Client.new(servers: [primary], &failover_proc)
-      client.failover_callback.should eql(failover_proc)
+      client.failure_callback.should eql(failover_proc)
     end
   end
 
@@ -95,7 +95,7 @@ describe RedisWithFailover::Client do
     it 'should call block when a failover occurs' do
       proc_called = false
       failed_redis = nil
-      client.failover_callback = lambda { |failed_redis_server|
+      client.failure_callback = lambda { |failed_redis_server|
         proc_called = true
         failed_redis = failed_redis_server
       }

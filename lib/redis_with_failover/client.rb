@@ -3,12 +3,12 @@ module RedisWithFailover
   end
 
   class Client
-    attr_accessor :servers, :failover_callback
+    attr_accessor :servers, :failure_callback
 
     EXCEPTIONS_TO_HANDLE = [Errno::ECONNREFUSED, Errno::ECONNRESET, Redis::BaseConnectionError]
 
     def initialize(options = {}, &block)
-      self.failover_callback = block if block
+      self.failure_callback = block if block
       self.servers = options[:servers]
       raise ArgumentError.new if self.servers.nil? || self.servers.empty?
     end
@@ -21,7 +21,7 @@ module RedisWithFailover
           response = server.send(method, *args, &block)
           break
         rescue *EXCEPTIONS_TO_HANDLE => e
-          failover_callback.call(server) if failover_callback
+          failure_callback.call(server) if failure_callback
           error = e
         end
       end
