@@ -37,9 +37,9 @@ An optional proc can be defined, which will be called when a failover occurs:
 redis = RedisWithFailover::Client.new(servers: [
             Redis.new(url: "redis://127.0.0.1:6379"),
             Redis.new(url: "redis://127.0.0.1:6380"),
-            Redis.new(url: "redis://127.0.0.1:6381")]) do |failed_redis|
+            Redis.new(url: "redis://127.0.0.1:6381")]) do |failed_redis, error|
 
-   Rails.logger.warn("Redis command failed on #{failed_redis.inspect}, failing over to the next one")
+   Rails.logger.warn("Redis command raised #{error.class} #{error.message} on #{failed_redis.inspect}, failing over to the next one")
 end
 ```
 

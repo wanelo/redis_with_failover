@@ -100,9 +100,11 @@ describe RedisWithFailover::Client do
     it 'should call block when a failover occurs' do
       proc_called = false
       failed_redis = nil
-      client.failure_callback = lambda { |failed_redis_server|
+      error = nil
+      client.failure_callback = lambda { |failed_redis_server, raised_error|
         proc_called = true
         failed_redis = failed_redis_server
+        error = raised_error
       }
       primary.stub(:get).and_raise(Errno::ECONNREFUSED)
       primary.set('key', 'value')
@@ -110,6 +112,7 @@ describe RedisWithFailover::Client do
 
       proc_called.should eql(true)
       failed_redis.should eql(primary)
+      error.should be_an(Errno::ECONNREFUSED)
     end
   end
 end
