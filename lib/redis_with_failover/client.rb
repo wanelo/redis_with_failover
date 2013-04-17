@@ -14,10 +14,10 @@ module RedisWithFailover
     end
 
     def method_missing(method, *args, &block)
-      response = nil
-      error = nil
+      response = error = nil
       self.servers.each do |server|
         begin
+          error = nil
           response = server.send(method, *args, &block)
           break
         rescue *EXCEPTIONS_TO_HANDLE => e
@@ -25,7 +25,7 @@ module RedisWithFailover
           error = e
         end
       end
-      raise(error) unless response
+      raise(error) if error
       response
     end
   end

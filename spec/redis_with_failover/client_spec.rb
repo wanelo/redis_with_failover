@@ -44,12 +44,16 @@ describe RedisWithFailover::Client do
         end
 
         context 'primary redis throws a connection error' do
-          before do
-            primary.should_receive(:get).and_raise(error)
+          it 'gets data from failover redis' do
+            primary.stub(:get).and_raise(error)
+            client.get('key').should eql('some value')
           end
 
-          it 'gets data from failover redis' do
-            client.get('key').should eql('some value')
+          it 'succeeds even if redis response is nil' do\
+            primary.stub(:get).and_raise(error)
+            expect {
+              client.get('unknown_key')
+            }.not_to raise_error
           end
         end
 
@@ -79,6 +83,7 @@ describe RedisWithFailover::Client do
               client.get('key')
             }.to raise_error(error)
           end
+
         end
       end
     end
